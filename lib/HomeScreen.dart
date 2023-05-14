@@ -8,6 +8,8 @@ import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
 import 'dart:io';
+import 'image_display_screen.dart';
+import 'image_repository.dart';
 
 import 'package:http/http.dart' as http;
 
@@ -39,6 +41,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final ImageRepository _imageRepository = ImageRepository();
   String selectedImagePath = '';
   String predictedClass = '';
 
@@ -46,10 +49,15 @@ class _HomeScreenState extends State<HomeScreen> {
     final picker = ImagePicker();
     final pickedFile = await picker.getImage(source: ImageSource.gallery);
     setState(() {
-      selectedImagePath = pickedFile!.path;
-      predictedClass = '';
+      if (pickedFile != null) {
+        final imageFile = File(pickedFile.path);
+        _imageRepository.setSelectedImage(imageFile);
+        selectedImagePath = imageFile.path;
+        predictedClass = '';
+      }
     });
   }
+
 
   Future<void> _predictImage() async {
     if (selectedImagePath != '') {
@@ -64,80 +72,173 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.yellow.shade800,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            selectedImagePath == ''
-                ? Image.asset(
-              'assets/image_placeholder.png',
-              height: 200,
-              width: 200,
-              fit: BoxFit.fill,
-            )
-                : Image.file(
-              File(selectedImagePath),
-              height: 200,
-              width: 200,
-              fit: BoxFit.fill,
-            ),
-            Text(
-              'Select Image',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0),
-            ),
-            SizedBox(
-              height: 20.0,
-            ),
-            ElevatedButton(
-              style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all(Colors.green),
-                padding: MaterialStateProperty.all(const EdgeInsets.all(20)),
-                textStyle: MaterialStateProperty.all(
-                  TextStyle(fontSize: 20),
+      body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/background.png'),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              selectedImagePath == ''
+                  ? Image.asset(
+                'assets/image_placeholder.png',
+                height: 300,
+                width: 340,
+                fit: BoxFit.fill,
+              )
+                  : Image.file(
+                File(selectedImagePath),
+                height: 300,
+                width: 340,
+                fit: BoxFit.fill,
+              ),
+              Text(
+                'Select Image',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0, fontFamily: 'BreeSerif',),
+              ),
+              SizedBox(
+                height: 20.0,
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.all(4),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  primary: Colors.transparent,
+                  elevation: 10,
+                ),
+                onPressed: _selectImage,
+                child: Container(
+                 width: 200,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(30),
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.blue.shade800,
+                        Colors.blue.shade700,
+                        Colors.blue.shade600,
+                        Colors.blue.shade500,
+                      ],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
+                  ),
+                  child: Center(
+                    child: Text(
+                      'Select Image',
+                      style: TextStyle(color: Colors.white, fontSize: 20, fontFamily: 'BreeSerif',),
+                    ),
+                  ),
                 ),
               ),
-              onPressed: _selectImage,
-              child: Text('Select Image'),
-            ),
-            SizedBox(
-              height: 20.0,
-            ),
-            ElevatedButton(
-              style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all(Colors.blue),
-                padding: MaterialStateProperty.all(const EdgeInsets.all(20)),
-                textStyle: MaterialStateProperty.all(
-                  TextStyle(fontSize: 20),
+
+
+              SizedBox(
+                height: 20.0,
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.all(4),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  primary: Colors.transparent,
+                  elevation: 10,
+                ),
+                onPressed: _predictImage,
+                child: Container(
+                  width: 200,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(30),
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.blue.shade800,
+                        Colors.blue.shade700,
+                        Colors.blue.shade600,
+                        Colors.blue.shade500,
+                      ],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
+                  ),
+                  child: Center(
+                    child: Text(
+                      'Predict',
+                      style: TextStyle(color: Colors.white, fontSize: 20, fontFamily: 'BreeSerif',),
+                    ),
+                  ),
                 ),
               ),
-              onPressed: _predictImage,
-              child: Text('Predict'),
-            ),
-            SizedBox(
-              height: 20.0,
-            ),
-            Text(
-              'Prediction Result: $predictedClass',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 20.0,
+
+              SizedBox(
+                height: 20.0,
               ),
-            ),
-          ],
+              Text(
+                'Prediction Result: $predictedClass',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20.0,
+                    fontFamily: 'BreeSerif',
+                ),
+              ),
+              SizedBox(
+                height: 20.0,
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.all(4),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  primary: Colors.transparent,
+                  elevation: 10,
+                ),
+                onPressed: _navigateToNextPage,
+                child: Container(
+                  width: 200,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(30),
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.blue.shade800,
+                        Colors.blue.shade700,
+                        Colors.blue.shade600,
+                        Colors.blue.shade500,
+                      ],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
+                  ),
+                  child: Center(
+                    child: Text(
+                      'Next',
+                      style: TextStyle(color: Colors.white, fontSize: 20, fontFamily: 'BreeSerif',),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
 
-  Future selectImage() {
-    return showDialog(
+  Future<void> _selectImagefrom() async {
+    showDialog(
       context: context,
       builder: (BuildContext context) {
         return Dialog(
-          shape:
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
           child: Container(
             height: 200,
             child: Padding(
@@ -145,24 +246,26 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Column(
                 children: [
                   Text(
-                    'Select Image From !',
-                    style: TextStyle(
-                        fontSize: 18.0, fontWeight: FontWeight.bold),
+                    'Select Image From',
+                    style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       GestureDetector(
                         onTap: () async {
-                          selectedImagePath =
-                          await selectImageFromGallery();
-                          if (selectedImagePath != '') {
+                          final pickedFile = await ImagePicker().getImage(source: ImageSource.gallery);
+                          if (pickedFile != null) {
+                            final imageFile = File(pickedFile.path);
+                            _imageRepository.setSelectedImage(imageFile);
+                            selectedImagePath = imageFile.path;
+                            predictedClass = '';
                             Navigator.pop(context);
                             setState(() {});
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text("No Image Selected !"),
+                                content: Text("No Image Selected!"),
                               ),
                             );
                           }
@@ -186,14 +289,18 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       GestureDetector(
                         onTap: () async {
-                          selectedImagePath = await selectImageFromCamera();
-                          if (selectedImagePath != '') {
+                          final pickedFile = await ImagePicker().getImage(source: ImageSource.camera);
+                          if (pickedFile != null) {
+                            final imageFile = File(pickedFile.path);
+                            _imageRepository.setSelectedImage(imageFile);
+                            selectedImagePath = imageFile.path;
+                            predictedClass = '';
                             Navigator.pop(context);
                             setState(() {});
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text("No Image Captured !"),
+                                content: Text("No Image Captured!"),
                               ),
                             );
                           }
@@ -217,13 +324,22 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ],
                   ),
-
                 ],
               ),
             ),
           ),
         );
       },
+    );
+  }
+
+
+  void _navigateToNextPage() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ImageDisplayScreen(),
+      ),
     );
   }
 

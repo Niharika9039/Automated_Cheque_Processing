@@ -66,6 +66,9 @@ flutter:
     - family: Lobster
       fonts:
         - asset: assets/fonts/Lobster/Lobster-Regular.ttf
+    - family: BreeSerif
+      fonts:
+        - asset: assets/fonts/Bree_Serif/BreeSerif-Regular.ttf
   assets:
     - assets/
   # To add assets to your application, add an assets section, like this:

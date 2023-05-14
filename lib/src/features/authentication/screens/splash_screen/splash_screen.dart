@@ -134,7 +134,7 @@ class _SplashScreenState extends State<SplashScreen> {
     setState(() => animate = true);
     await Future.delayed(Duration(milliseconds: 5000));
     SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
-   // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomeScreen()));
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomeScreen()));
   }
 }
 
